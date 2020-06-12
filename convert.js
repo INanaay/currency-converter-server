@@ -17,7 +17,6 @@ const convertCurrency = (body, res) => {
   request(url, (error, response, responseBody) => {
     if (!error && response.statusCode === 200) {
       responseBody = JSON.parse(responseBody);
-      console.log(responseBody)
       const rate = responseBody[body.quote_currency];
       const value = Number(body.value);
       if (isNaN(value)) {

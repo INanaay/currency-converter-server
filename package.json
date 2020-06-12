@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Currency converter api",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -14,5 +11,14 @@
     "express": "^4.17.1",
     "nodemon": "^2.0.4",
     "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^2.0.1",
+    "mocha": "^2.4.5"
+  },
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "mocha --timeout 10000"
   }
 }
