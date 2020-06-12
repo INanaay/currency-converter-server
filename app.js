@@ -11,7 +11,7 @@ app.use(express.json());
 
 
 app.get('/', (req, res) => {
-  res.send("Welcome to the best currency converter server");
+  res.send("Welcome to the best currency converter server ever");
 });
 
 
