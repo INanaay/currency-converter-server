@@ -1,36 +1,57 @@
 const request = require('request');
 
-
 const handleConvertion = (req, res) => {
-  const {body} = req;
+  const {query} = req;
+  console.log("received body :");
+  console.log(query)
 
-  if (!isBodyValid(body)) {
+  if (!isBodyValid(query)) {
     res.status(400).send("Missing Parameters");
     return;
   }
-  convertCurrency(body, res);
-
+  convertCurrency(query, res);
 };
 
 const convertCurrency = (body, res) => {
+  let JSONresponse = {};
   const url = `https://min-api.cryptocompare.com/data/price?fsym=${body.base_currency}&tsyms=${body.quote_currency}`;
-  request(url, (error, response, responseBody) => {
-    if (!error && response.statusCode === 200) {
-      responseBody = JSON.parse(responseBody);
-      const rate = responseBody[body.quote_currency];
-      const value = Number(body.value);
-      if (isNaN(value)) {
-        res.status(400).send("Invalid Value Parameter");
-        return;
-      }
-      const JSONresponse = {"converted_value" : rate * Number(body.value)};
-      res.send(JSONresponse)
+  const historyUrl = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${body.base_currency}&tsym=${body.quote_currency}&limit=10`;
+
+  getRequest(url).then((conversionBody) => {
+    console.log(conversionBody)
+    conversionBody = JSON.parse(conversionBody);
+    const rate = conversionBody[body.quote_currency];
+    const value = Number(body.value);
+    if (isNaN(value)) {
+      res.status(400).send("Invalid Value Parameter");
+      return;
     }
-    else {
-      res.status(400).send("Invalid Parameters");
-    }
-  })
+    JSONresponse.converted_value = rate * value;
+    return getRequest(historyUrl)
+  }).then((historyBody) => {
+    historyBody = JSON.parse(historyBody);
+    JSONresponse.history = historyBody.Data;
+
+    res.send(JSONresponse);
+  });
+
+
+
+
+
 };
+
+const getRequest = (url) => {
+  return new Promise(function (success, failure) {
+    request(url, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        success(body);
+      } else {
+        failure(error);
+      }
+    });
+  });
+}
 
 const isBodyValid = (body) => {
   return (body.hasOwnProperty("base_currency" ) && body.hasOwnProperty("value") &&

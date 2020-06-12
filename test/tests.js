@@ -10,7 +10,7 @@ describe('GET /convert', () => {
   it("Should convert EUR to USD", (done) => {
     chai.request(server)
     .get("/convert")
-    .send(({base_currency: "EUR",
+    .query(({base_currency: "EUR",
     value: 1000,
     quote_currency : "USD"}))
     .end((err, res) => {
@@ -21,7 +21,7 @@ describe('GET /convert', () => {
   it("Should convert EUR to BTC", (done) => {
     chai.request(server)
     .get("/convert")
-    .send(({base_currency: "EUR",
+    .query(({base_currency: "EUR",
       value: 1000,
       quote_currency : "BTC"}))
     .end((err, res) => {
@@ -33,7 +33,7 @@ describe('GET /convert', () => {
   it("Missing base_currency param, should return 400", (done) => {
     chai.request(server)
     .get("/convert")
-    .send(({
+    .query(({
       value: 1000,
       quote_currency : "BTC"}))
     .end((err, res) => {
@@ -45,7 +45,7 @@ describe('GET /convert', () => {
   it("Wrong value param, should return 400", (done) => {
     chai.request(server)
     .get("/convert")
-    .send(({
+    .query(({
       base_currency: "EUR",
       value: "wrong",
       quote_currency : "BTC"}))
@@ -58,13 +58,13 @@ describe('GET /convert', () => {
   it("Non existing currency, should return 200 and null response", (done) => {
     chai.request(server)
     .get("/convert")
-    .send(({
+    .query(({
       base_currency: "WRONG",
       value: "2000",
       quote_currency : "BTC"}))
     .end((err, res) => {
       res.should.have.status(200);
-      res.body.should.be.eql({converted_value: null})
+      res.body.should.be.eql({converted_value: null, history: {}})
       done()
     })
   })
