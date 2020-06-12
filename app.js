@@ -4,7 +4,7 @@ const cors = require('cors');
 const conversion = require('./convert')
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
