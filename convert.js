@@ -2,9 +2,6 @@ const request = require('request');
 
 const handleConvertion = (req, res) => {
   const {query} = req;
-  console.log("received body :");
-  console.log(query)
-
   if (!isBodyValid(query)) {
     res.status(400).send("Missing Parameters");
     return;
@@ -15,10 +12,9 @@ const handleConvertion = (req, res) => {
 const convertCurrency = (body, res) => {
   let JSONresponse = {};
   const url = `https://min-api.cryptocompare.com/data/price?fsym=${body.base_currency}&tsyms=${body.quote_currency}`;
-  const historyUrl = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${body.base_currency}&tsym=${body.quote_currency}&limit=10`;
+  const historyUrl = `https://min-api.cryptocompare.com/data/exchange/histoday?tsym=${body.quote_currency}&limit=10`;
 
   getRequest(url).then((conversionBody) => {
-    console.log(conversionBody)
     conversionBody = JSON.parse(conversionBody);
     const rate = conversionBody[body.quote_currency];
     const value = Number(body.value);

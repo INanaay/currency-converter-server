@@ -33,8 +33,7 @@ describe('GET /convert', () => {
   it("Missing base_currency param, should return 400", (done) => {
     chai.request(server)
     .get("/convert")
-    .query(({
-      value: 1000,
+    .query(({value: 1000,
       quote_currency : "BTC"}))
     .end((err, res) => {
       res.should.have.status(400);
@@ -55,18 +54,5 @@ describe('GET /convert', () => {
     })
   })
 
-  it("Non existing currency, should return 200 and null response", (done) => {
-    chai.request(server)
-    .get("/convert")
-    .query(({
-      base_currency: "WRONG",
-      value: "2000",
-      quote_currency : "BTC"}))
-    .end((err, res) => {
-      res.should.have.status(200);
-      res.body.should.be.eql({converted_value: null, history: {}})
-      done()
-    })
-  })
 
 })
