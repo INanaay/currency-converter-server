@@ -1,4 +1,4 @@
-const request = require('request');
+const axios = require('axios');
 
 const handleConvertion = (req, res) => {
   const {query} = req;
@@ -14,47 +14,33 @@ const convertCurrency = (body, res) => {
   const url = `https://min-api.cryptocompare.com/data/price?fsym=${body.base_currency}&tsyms=${body.quote_currency}`;
   const historyUrl = `https://min-api.cryptocompare.com/data/exchange/histoday?tsym=${body.quote_currency}&limit=10`;
 
-  getRequest(url).then((conversionBody) => {
-    conversionBody = JSON.parse(conversionBody);
-    const rate = conversionBody[body.quote_currency];
-    const value = Number(body.value);
-    if (isNaN(value)) {
-      res.status(400).send("Invalid Value Parameter");
-      return;
+  const ratePromise = axios.get(url);
+  const historyPromise = axios.get(historyUrl);
+  Promise.all([ratePromise, historyPromise]).then((values) => {
+    if (values[0].status === 200 && values[1].status === 200) {
+      console.log(values[0].data);
+      const rate = values[0].data[body.quote_currency]
+      const value = Number(body.value);
+      if (isNaN(value)) {
+        res.status(400).send("Invalid Value Parameter");
+        return;
+      }
+      JSONresponse.converted_value = rate * value;
+
+      JSONresponse.history = values[1].data.Data;
+      res.send(JSONresponse);
+
     }
-    JSONresponse.converted_value = rate * value;
-    return getRequest(historyUrl)
-  }).then((historyBody) => {
-    historyBody = JSON.parse(historyBody);
-    JSONresponse.history = historyBody.Data;
-
-    res.send(JSONresponse);
+    else
+      res.status(400).send("Something went wrong");
   });
-
-
-
-
 
 };
-
-const getRequest = (url) => {
-  return new Promise(function (success, failure) {
-    request(url, function (error, response, body) {
-      if (!error && response.statusCode == 200) {
-        success(body);
-      } else {
-        failure(error);
-      }
-    });
-  });
-}
 
 const isBodyValid = (body) => {
   return (body.hasOwnProperty("base_currency" ) && body.hasOwnProperty("value") &&
     body.hasOwnProperty("quote_currency"))
 };
-
-
 
 
 module.exports = {
